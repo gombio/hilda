@@ -16,14 +16,15 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 
-	v "github.com/gombio/hilda/verify"
+	ht "github.com/gombio/hilda/test"
 	"github.com/spf13/cobra"
 )
 
-// verifyCmd represents the verify command
-var verifyCmd = &cobra.Command{
-	Use:   "verify",
+// testCmd represents the test command
+var testCmd = &cobra.Command{
+	Use:   "test",
 	Short: "Verify provided hosts",
 	Long: `Visits each host and run verification process.
 
@@ -38,21 +39,38 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, url := range args {
-			v.Verify(url)
+			c := ht.NewContext(url)
+			r := ht.NewReport(url)
+			//tests
+			ht.Request(c, r)
+			ht.Http(c, r)
+			ht.Services(c, r)
+
+			fmt.Println(r.URL + " => " + r.Status)
+			for c, f := range r.Components {
+				status := ht.StatusOk
+				if len(f) > 0 {
+					status = ht.StatusError
+				}
+				fmt.Println("=> " + c + ": " + status)
+				for k, v := range f {
+					fmt.Println("--> " + k + ": " + v)
+				}
+			}
 		}
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(verifyCmd)
+	RootCmd.AddCommand(testCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// verifyCmd.PersistentFlags().String("hosts", "", "Comma separated list of full /healthz URLs to visit. Ex. http://example.com/healthz")
+	// testCmd.PersistentFlags().String("hosts", "", "Comma separated list of full /healthz URLs to visit. Ex. http://example.com/healthz")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// verifyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
