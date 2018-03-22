@@ -18,9 +18,13 @@ import (
 	"errors"
 	"fmt"
 
+	configReport "github.com/gombio/hilda/config"
 	ht "github.com/gombio/hilda/test"
 	"github.com/spf13/cobra"
 )
+
+// init config
+var config = configReport.Init("server.yaml")
 
 // testCmd represents the test command
 var testCmd = &cobra.Command{
@@ -31,6 +35,10 @@ var testCmd = &cobra.Command{
 Provide list of full /healthz URLs to visit separated with space.
 Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/healthz`,
 	Args: func(cmd *cobra.Command, args []string) error {
+		// check if config has arguments; if has input arguments amount doesn't have to be check
+		if config.IsActive() {
+			return nil
+		}
 		if len(args) < 1 {
 			return errors.New("please provide a list of full /healthz URLs to visit separated with space")
 		}
@@ -39,8 +47,11 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, url := range args {
-			c := ht.NewContext(url)
-			r := ht.NewReport(url)
+			config.AddServer(url, []string{})
+		}
+		for _, server := range config.GetServers() {
+			c := ht.NewContext(server.GetUrl())
+			r := ht.NewReport(server.GetUrl())
 			//tests
 			ht.Request(c, r)
 			ht.Http(c, r)
