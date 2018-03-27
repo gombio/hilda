@@ -32,12 +32,13 @@ func (c Config) GetServers() []Server {
 func (c *Config) AddServer(url string, params []string) {
 
 	for _, server := range c.serverList {
-		if strings.Contains(server.GetUrl(), url) {
+		if strings.Contains(server.GetURL(), url) {
 			return
 		}
 	}
 
 	server, err := createServer(url, params)
+	//TODO: provide tests
 	if err != nil {
 		log.Printf("Server with url: '%s' has not been added \n", url)
 		return

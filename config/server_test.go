@@ -24,7 +24,7 @@ func TestUrlCorrectServer(t *testing.T) {
 	url := "http://example.com/"
 	server, _ := createServer(url, []string{})
 
-	if server.GetUrl() != "http://example.com/" {
-		t.Fatalf("Server url should be proper but is equal to: '%s'", server.GetUrl())
+	if server.GetURL() != "http://example.com/" {
+		t.Fatalf("Server url should be proper but is equal to: '%s'", server.GetURL())
 	}
 }

@@ -1,9 +1,10 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"reflect"
 	"testing"
+
+	"gopkg.in/yaml.v2"
 )
 
 var fileContent = `
@@ -16,31 +17,28 @@ report_file: 'debug.txt'
 `
 
 func TestUnmarshalConfigFile(t *testing.T) {
+	cf := configFile{}
 
-	configFile := configFile{}
-
-	err := yaml.Unmarshal([]byte(fileContent), &configFile)
+	err := yaml.Unmarshal([]byte(fileContent), &cf)
 	if err != nil {
 		t.Errorf("Yaml file cannot be unmarshal: %s", err)
 	}
 }
 
 func TestReportFileParameter(t *testing.T) {
+	cf := configFile{}
+	yaml.Unmarshal([]byte(fileContent), &cf)
 
-	configFile := configFile{}
-	yaml.Unmarshal([]byte(fileContent), &configFile)
-
-	if configFile.ReportFile != "debug.txt" {
+	if cf.ReportFile != "debug.txt" {
 		t.Error("Report file parameter is incorrect")
 	}
 }
 
 func TestServerParameters(t *testing.T) {
+	cf := configFile{}
+	yaml.Unmarshal([]byte(fileContent), &cf)
 
-	configFile := configFile{}
-	yaml.Unmarshal([]byte(fileContent), &configFile)
-
-	for url, params := range configFile.Server {
+	for url, params := range cf.Server {
 		if url == "https://example.com" {
 			eq := reflect.DeepEqual(params, reportConfig{Params: map[string]string{"ca": "disable"}})
 			if !eq {

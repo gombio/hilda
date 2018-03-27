@@ -5,7 +5,7 @@ import (
 )
 
 type Server interface {
-	GetUrl() string
+	GetURL() string
 	GetFlags() []string
 }
 
@@ -24,10 +24,11 @@ func createServer(address string, params []string) (server, error) {
 	}, nil
 }
 
-func (s server) GetUrl() string {
+func (s server) GetURL() string {
 	return s.url
 }
 
+//TODO: provide test
 func (s server) GetFlags() []string {
 	return s.disableParams
 }
