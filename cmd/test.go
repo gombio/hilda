@@ -15,11 +15,14 @@
 package cmd
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"net/http"
 
 	configReport "github.com/gombio/hilda/config"
 	ht "github.com/gombio/hilda/test"
+	cmpt "github.com/gombio/hilda/test/component"
 	"github.com/spf13/cobra"
 )
 
@@ -50,15 +53,23 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 			config.AddServer(url, []string{})
 		}
 		for _, server := range config.GetServers() {
-			c := ht.NewContext(server.GetUrl())
-			r := ht.NewReport(server.GetUrl())
-			//tests
-			ht.Request(c, r)
-			ht.Http(c, r)
-			ht.Services(c, r)
+			ctx := ht.NewContext(server.GetURL())
+			rpt := ht.NewReport(server.GetURL())
 
-			fmt.Println(r.URL + " => " + r.Status)
-			for c, f := range r.Components {
+			//tests
+			cmpt.Request(
+				&http.Client{Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				}},
+				&http.Client{Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
+				}},
+			)(ctx, rpt)
+			cmpt.Http()(ctx, rpt)
+			cmpt.Services()(ctx, rpt)
+
+			fmt.Println(rpt.URL + " => " + rpt.Status)
+			for c, f := range rpt.Components {
 				status := ht.StatusOk
 				if len(f) > 0 {
 					status = ht.StatusError

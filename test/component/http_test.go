@@ -1,21 +1,25 @@
-package test
+package component
 
-import "testing"
+import (
+	"testing"
+
+	ht "github.com/gombio/hilda/test"
+)
 
 func TestHttp(t *testing.T) {
 	url := "test"
-	ctx := NewContext(url)
+	ctx := ht.NewContext(url)
 	ctx.Response.StatusCode = 200
-	rpt := NewReport(url)
+	rpt := ht.NewReport(url)
 
-	Http(ctx, rpt)
-	if rpt.Status != StatusOk {
+	Http()(ctx, rpt)
+	if rpt.Status != ht.StatusOk {
 		t.Fatal()
 	}
 
 	ctx.Response.StatusCode = 500
-	Http(ctx, rpt)
-	if rpt.Status != StatusError {
+	Http()(ctx, rpt)
+	if rpt.Status != ht.StatusError {
 		t.Fatal()
 	}
 	if rpt.Components["http"]["status_code"] != "ERROR: Invalid status code 500" {

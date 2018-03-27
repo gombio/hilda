@@ -1,10 +1,12 @@
-package test
+package component
 
 import (
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	ht "github.com/gombio/hilda/test"
 )
 
 func TestServices(t *testing.T) {
@@ -17,11 +19,11 @@ func TestServices(t *testing.T) {
 	}
 	handler(w, req)
 
-	ctx := NewContext(url)
+	ctx := ht.NewContext(url)
 	ctx.Response = w.Result()
-	rpt := NewReport(url)
-	Services(ctx, rpt)
-	if rpt.Status != StatusError {
+	rpt := ht.NewReport(url)
+	Services()(ctx, rpt)
+	if rpt.Status != ht.StatusError {
 		t.Fatal("non-JSON input should be marked as error")
 	}
 	if rpt.Components["services"]["error"] != "Error decoding JSON: invalid character 'T' looking for beginning of value" {
@@ -37,15 +39,15 @@ func TestServices(t *testing.T) {
 	}
 	handler(w, req)
 
-	ctx = NewContext(url)
+	ctx = ht.NewContext(url)
 	ctx.Response = w.Result()
-	rpt = NewReport(url)
-	Services(ctx, rpt)
+	rpt = ht.NewReport(url)
+	Services()(ctx, rpt)
 
-	if rpt.Status != StatusError {
+	if rpt.Status != ht.StatusError {
 		t.Fatal("If any service is down, whole report should have status Error")
 	}
-	if rpt.Components["services"]["redis"] != StatusError {
+	if rpt.Components["services"]["redis"] != ht.StatusError {
 		t.Fatal("expected failed redis service")
 	}
 
@@ -58,15 +60,15 @@ func TestServices(t *testing.T) {
 	}
 	handler(w, req)
 
-	ctx = NewContext(url)
+	ctx = ht.NewContext(url)
 	ctx.Response = w.Result()
-	rpt = NewReport(url)
-	Services(ctx, rpt)
-	if rpt.Status != StatusOk {
+	rpt = ht.NewReport(url)
+	Services()(ctx, rpt)
+	if rpt.Status != ht.StatusOk {
 		t.Fatal("If all servives are ok, report should have StatusOk")
 	}
 	for svc, status := range rpt.Components["services"] {
-		if status != StatusOk {
+		if status != ht.StatusOk {
 			t.Fatalf("Service %s should have status OK", svc)
 		}
 	}
