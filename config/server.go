@@ -2,7 +2,6 @@ package config
 
 import (
 	"net/url"
-	"strings"
 )
 
 type Server interface {
@@ -20,13 +19,13 @@ func createServer(address string, params []string) (server, error) {
 		return server{}, err
 	}
 	return server{
-		url:           strings.Trim(address, "/"),
+		url:           address,
 		disableParams: params,
 	}, nil
 }
 
 func (s server) GetUrl() string {
-	return s.url + "/healthz"
+	return s.url
 }
 
 func (s server) GetFlags() []string {
