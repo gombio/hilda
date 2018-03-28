@@ -6,6 +6,7 @@ pipeline:
   build:
     image: golang:latest
     commands:
+      - go get ./...
       - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - dep ensure
       - go test
