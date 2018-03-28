@@ -3,14 +3,50 @@ workspace:
   path: src/github.com/gombio/hilda
 
 pipeline:
-  build:
+  test:
     image: golang:latest
+    environment:
+      - CGO=0
+      - GOOS=linux
+      - GOARCH=amd64
     commands:
       - go get ./...
-      - go get -u golang.org/x/lint/golint
       - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - dep ensure
+      - go get -u golang.org/x/lint/golint
       - go test `find . -type d -not -path "./vendor*" -not -path "./.git*"`
       - golint `find . -type d -not -path "./vendor*" -not -path "./.git*"`
       - go vet `find . -type d -not -path "./vendor*" -not -path "./.git*"`
       - go build
+  build-linux-32:
+    image: golang:latest
+    environment:
+      - CGO=0
+      - GOOS=linux
+      - GOARCH=386
+    commands:
+      - go build -o hilda-linux-386
+  build-osx-32:
+    image: golang:latest
+    environment:
+      - CGO=0
+      - GOOS=darwin
+      - GOARCH=386
+    commands:
+      - go build -o hilda-osx-386
+  build-linux-64:
+    image: golang:latest
+    environment:
+      - CGO=0
+      - GOOS=linux
+      - GOARCH=amd64
+    commands:
+      - go build -o hilda-linux-amd64
+  build-osx-64:
+    image: golang:latest
+    environment:
+      - CGO=0
+      - GOOS=darwin
+      - GOARCH=amd64
+    commands:
+      - go build -o hilda-osx-amd64
