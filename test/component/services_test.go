@@ -23,7 +23,7 @@ func TestServices(t *testing.T) {
 	ctx.Response = w.Result()
 	rpt := ht.NewReport(url)
 	Services()(ctx, rpt)
-	if rpt.Status != ht.StatusError {
+	if rpt.Status != "Error" { //TODO: get rid of magic constant
 		t.Fatal("non-JSON input should be marked as error")
 	}
 	if rpt.Components["services"]["error"] != "Error decoding JSON: invalid character 'T' looking for beginning of value" {
@@ -44,10 +44,10 @@ func TestServices(t *testing.T) {
 	rpt = ht.NewReport(url)
 	Services()(ctx, rpt)
 
-	if rpt.Status != ht.StatusError {
+	if rpt.Status != "Error" { //TODO: get rid of magic constant
 		t.Fatal("If any service is down, whole report should have status Error")
 	}
-	if rpt.Components["services"]["redis"] != ht.StatusError {
+	if rpt.Components["services"]["redis"] != "Error" { //TODO: get rid of magic constant
 		t.Fatal("expected failed redis service")
 	}
 
@@ -64,11 +64,11 @@ func TestServices(t *testing.T) {
 	ctx.Response = w.Result()
 	rpt = ht.NewReport(url)
 	Services()(ctx, rpt)
-	if rpt.Status != ht.StatusOk {
+	if rpt.Status != "OK" { //TODO: get rid of magic constant
 		t.Fatal("If all servives are ok, report should have StatusOk")
 	}
 	for svc, status := range rpt.Components["services"] {
-		if status != ht.StatusOk {
+		if status != "OK" { //TODO: get rid of magic constant
 			t.Fatalf("Service %s should have status OK", svc)
 		}
 	}

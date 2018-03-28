@@ -7,6 +7,7 @@ import (
 	ht "github.com/gombio/hilda/test"
 )
 
+//Services tests returned status of services (parses JSON with service's status)
 func Services() Component {
 	return func(c *ht.Context, r *ht.Report) {
 		r.Components["services"] = make(map[string]string)

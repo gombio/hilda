@@ -4,6 +4,7 @@ import (
 	"net/url"
 )
 
+//Server TODO: description
 type Server interface {
 	GetURL() string
 	GetFlags() []string

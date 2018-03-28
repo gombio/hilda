@@ -65,14 +65,14 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 					TLSClientConfig: &tls.Config{InsecureSkipVerify: false},
 				}},
 			)(ctx, rpt)
-			cmpt.Http()(ctx, rpt)
+			cmpt.HTTP()(ctx, rpt)
 			cmpt.Services()(ctx, rpt)
 
 			fmt.Println(rpt.URL + " => " + rpt.Status)
 			for c, f := range rpt.Components {
-				status := ht.StatusOk
+				status := "OK"
 				if len(f) > 0 {
-					status = ht.StatusError
+					status = "Error"
 				}
 				fmt.Println("=> " + c + ": " + status)
 				for k, v := range f {

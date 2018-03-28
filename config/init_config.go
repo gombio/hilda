@@ -7,7 +7,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-//TODO: provide tests
+//Init TODO: provide tests and description
 func Init(file string) *Config {
 	config, err := initConfig(file)
 	if err != nil {

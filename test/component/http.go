@@ -7,7 +7,8 @@ import (
 	ht "github.com/gombio/hilda/test"
 )
 
-func Http() Component {
+//HTTP tests http response code etc.
+func HTTP() Component {
 	return func(c *ht.Context, r *ht.Report) {
 		r.Components["http"] = make(map[string]string)
 

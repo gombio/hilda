@@ -7,6 +7,7 @@ import (
 	ht "github.com/gombio/hilda/test"
 )
 
+//Request makes initial requests and test if there are any errors related to them
 func Request(client *http.Client, clientTLS *http.Client) Component {
 	// if client.Transport.(*http.Transport) {
 	//

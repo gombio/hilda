@@ -12,14 +12,14 @@ func TestHttp(t *testing.T) {
 	ctx.Response.StatusCode = 200
 	rpt := ht.NewReport(url)
 
-	Http()(ctx, rpt)
-	if rpt.Status != ht.StatusOk {
+	HTTP()(ctx, rpt)
+	if rpt.Status != "OK" { //TODO: get rid of magic constant
 		t.Fatal()
 	}
 
 	ctx.Response.StatusCode = 500
-	Http()(ctx, rpt)
-	if rpt.Status != ht.StatusError {
+	HTTP()(ctx, rpt)
+	if rpt.Status != "Error" { //TODO: get rid of magic constant
 		t.Fatal()
 	}
 	if rpt.Components["http"]["status_code"] != "ERROR: Invalid status code 500" {
