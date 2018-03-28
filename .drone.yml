@@ -11,6 +11,6 @@ pipeline:
       - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
       - dep ensure
       - go test `find . -type d -not -path "./vendor*" -not -path "./.git*"`
-      - golint `find . -type d -not -path "./vendor*" -not -path "./.git*"
+      - golint `find . -type d -not -path "./vendor*" -not -path "./.git*"`
       - go vet `find . -type d -not -path "./vendor*" -not -path "./.git*"`
       - go build
