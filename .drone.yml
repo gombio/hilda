@@ -1,0 +1,12 @@
+workspace:
+  base: /go
+  path: src/github.com/gombio/hilda
+
+pipeline:
+  build:
+    image: golang:latest
+    commands:
+      - dep ensure
+      # - go get ./...
+      - go test
+      - go build
