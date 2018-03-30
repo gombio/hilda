@@ -1,3 +1,5 @@
+TODO: Better readme
+
 # Config file
 
 Create `server.yaml` file alongside `main.go` file with example data:
