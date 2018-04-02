@@ -18,16 +18,12 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"net/http"
-
-	configReport "github.com/gombio/hilda/config"
+	"github.com/gombio/hilda/config"
 	ht "github.com/gombio/hilda/test"
 	cmpt "github.com/gombio/hilda/test/component"
 	"github.com/spf13/cobra"
+	"net/http"
 )
-
-// init config
-var config = configReport.Init("server.yaml")
 
 // testCmd represents the test command
 var testCmd = &cobra.Command{
@@ -38,10 +34,6 @@ var testCmd = &cobra.Command{
 Provide list of full /healthz URLs to visit separated with space.
 Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/healthz`,
 	Args: func(cmd *cobra.Command, args []string) error {
-		// check if config has arguments; if has input arguments amount doesn't have to be check
-		if config.IsActive() {
-			return nil
-		}
 		if len(args) < 1 {
 			return errors.New("please provide a list of full /healthz URLs to visit separated with space")
 		}
@@ -50,11 +42,8 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, url := range args {
-			config.AddServer(url, []string{})
-		}
-		for _, server := range config.GetServers() {
-			ctx := ht.NewContext(server.GetURL())
-			rpt := ht.NewReport(server.GetURL())
+			ctx := ht.NewContext(url)
+			rpt := ht.NewReport(url)
 
 			//tests
 			cmpt.Request(
@@ -70,6 +59,9 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 
 			fmt.Println(rpt.URL + " => " + rpt.Status)
 			for c, f := range rpt.Components {
+				if !showReport(c, cmd) {
+					continue
+				}
 				status := "OK"
 				if len(f) > 0 {
 					status = "Error"
@@ -84,6 +76,7 @@ Ex. http://example.com/healthz http://example2.com/healthz http://example3.com/h
 }
 
 func init() {
+	config.Init(testCmd)
 	RootCmd.AddCommand(testCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -95,4 +88,14 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// testCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+}
+
+func showReport(name string, cmd *cobra.Command) bool {
+	flagValue := cmd.Flag(config.LongName(name))
+
+	if flagValue == nil {
+		return true
+	}
+
+	return flagValue.Value.String() == "false"
 }
