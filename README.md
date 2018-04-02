@@ -1,12 +1,19 @@
-# Config file
+# Config
 
-Create `server.yaml` file alongside `main.go` file with example data:
+Optionally create `server.yaml` file alongside `main.go` file with example data:
 
 ```
-server:
-    https://example.com:
-        ca: 'disable'
-    https://exampleCompany.com: ~
+request: false
+http: true
+services: false
 
-report_file: 'debug.txt'
+```
+where 'true' means disable report component
+
+If you want to override setting from file use flags e.g.
+
+```
+hilda test http://example.com -r
+hilda test http://example.com -r -w=false
+hilda test http://example.com -s=true
 ```

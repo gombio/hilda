@@ -1,76 +1,93 @@
 package config
 
-import (
-	"testing"
-)
+import "testing"
 
-func TestIsActive(t *testing.T) {
-	c := Config{
-		serverList: []Server{new(server)},
-		fileReport: "",
-	}
+func TestInitBoolConfigName(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
 
-	if !c.IsActive() {
-		t.Error("Config should be active but it is not")
+	if conf.cnf.name != "bool-name" {
+		t.Errorf("Config name should be equal to 'bool-name' but is: %s", conf.cnf.name)
 	}
 }
 
-func TestIsNotActive(t *testing.T) {
-	c := Config{
-		serverList: []Server{},
-		fileReport: "",
-	}
+func TestInitBoolConfigDefaultValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
 
-	if c.IsActive() {
-		t.Error("Config should not be active but it is")
+	if conf.value {
+		t.Error("Default value should be equal to 'false'")
 	}
 }
 
-func TestMakingFileReport(t *testing.T) {
-	c := Config{
-		serverList: []Server{},
-		fileReport: "example.txt",
+func TestInitBoolConfigEnvDefault(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+
+	if conf.envValue {
+		t.Error("Config env value should not be set after init")
 	}
 
-	if !c.DoFileReport() {
-		t.Error("Config should make report in file but it will not")
-	}
-}
-
-func TestDoNotMakingFileReport(t *testing.T) {
-	c := Config{
-		serverList: []Server{},
-		fileReport: "",
-	}
-
-	if c.DoFileReport() {
-		t.Error("Config should not make report in file but it will")
+	if conf.cnf.valueFromEnv {
+		t.Error("Config should inform value from env was not setup aftr init")
 	}
 }
 
-func TestAddNewServer(t *testing.T) {
-	c := Config{
-		serverList: []Server{server{url: "http://company.com", disableParams: []string{}}},
-		fileReport: "",
+func TestInitBoolConfigFileDefault(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+
+	if conf.fileValue {
+		t.Error("Config file value should not be set after init")
 	}
-
-	c.AddServer("http://example.com", []string{"param#1"})
-	c.AddServer("http://hilda.com", []string{"param#2"})
-
-	if len(c.GetServers()) != 3 {
-		t.Errorf("There should be 3 servers in config file, but '%d' are", len(c.GetServers()))
+	if conf.cnf.valueFromFile {
+		t.Error("Config should inform value from file was not setup aftr init")
 	}
 }
 
-func TestAddDuplicatedServer(t *testing.T) {
-	c := Config{
-		serverList: []Server{server{url: "http://company.com", disableParams: []string{}}},
-		fileReport: "",
-	}
-	c.AddServer("http://example.com", []string{"param#1"})
-	c.AddServer("http://company.com", []string{})
+func TestSetFileValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+	conf.SetFileValue(true)
 
-	if len(c.GetServers()) != 2 {
-		t.Errorf("There should be 2 servers in config file, but are '%d'", len(c.GetServers()))
+	if !conf.fileValue {
+		t.Error("Config file value should be equal to 'true' but it is not")
+	}
+	if !conf.cnf.valueFromFile {
+		t.Error("Config should inform value from file was setup but it is not")
+	}
+}
+
+func TestSetEnvValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+	conf.SetEnvValue(true)
+
+	if !conf.envValue {
+		t.Error("Config env value should be equal to 'true' but it is not")
+	}
+	if !conf.cnf.valueFromEnv {
+		t.Error("Config should inform value from env was setup but it is not")
+	}
+}
+
+func TestGetWithEnvValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+	conf.SetFileValue(true)
+	conf.SetEnvValue(false)
+
+	if conf.Get() {
+		t.Error("Value should be taken from env")
+	}
+}
+
+func TestGetWithFileValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+	conf.SetFileValue(true)
+
+	if !conf.Get() {
+		t.Error("Value should be taken from file")
+	}
+}
+
+func TestGetWithDefaultValue(t *testing.T) {
+	conf := InitBoolConfig("bool-name")
+
+	if conf.Get() {
+		t.Error("Value should be default equal 'false'")
 	}
 }

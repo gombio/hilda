@@ -1,53 +1,55 @@
 package config
 
-import (
-	"log"
-	"strings"
-)
-
-//Configuration TODO: description
-type Configuration interface {
-	IsActive() bool
-	DoFileReport() bool
-	GetServers() []Server
-	AddServer(url string, params map[string]string)
+type config struct {
+	name          string
+	valueFromFile bool
+	valueFromEnv  bool
 }
 
-//Config TODO: description
-type Config struct {
-	serverList []Server
-	fileReport string
+// additional configuration from file/env if flag is not set
+type BoolConfig struct {
+	cnf       config
+	fileValue bool
+	envValue  bool
+	value     bool
 }
 
-//IsActive TODO: description
-func (c Config) IsActive() bool {
-	return len(c.serverList) > 0
-}
-
-//DoFileReport TODO: description
-func (c Config) DoFileReport() bool {
-	return len(c.fileReport) > 0
-}
-
-//GetServers TODO: description
-func (c Config) GetServers() []Server {
-	return c.serverList
-}
-
-//AddServer TODO: description
-func (c *Config) AddServer(url string, params []string) {
-
-	for _, server := range c.serverList {
-		if strings.Contains(server.GetURL(), url) {
-			return
-		}
+// init BoolConfig type with default values
+func InitBoolConfig(name string) *BoolConfig {
+	return &BoolConfig{
+		cnf: config{
+			name:          name,
+			valueFromFile: false,
+			valueFromEnv:  false,
+		},
+		fileValue: false,
+		envValue:  false,
+		value:     false,
 	}
+}
 
-	server, err := createServer(url, params)
-	//TODO: provide tests
-	if err != nil {
-		log.Printf("Server with url: '%s' has not been added \n", url)
-		return
+// SetFileValue set value from config file
+func (cb *BoolConfig) SetFileValue(val bool) {
+	cb.fileValue = val
+	cb.cnf.valueFromFile = true
+}
+
+// SetEnvValue set value from env variable
+func (cb *BoolConfig) SetEnvValue(val bool) {
+	cb.envValue = val
+	cb.cnf.valueFromEnv = true
+}
+
+// Get return proper value depends on hierarchy of the validity of the flag
+// if env value is set ten return env value
+// if env is not set return file value
+// if non of them is set return default value
+func (cb BoolConfig) Get() bool {
+	if cb.cnf.valueFromEnv {
+		return cb.envValue
 	}
-	c.serverList = append(c.serverList, server)
+	if cb.cnf.valueFromFile {
+		return cb.fileValue
+	}
+	return cb.value
 }
